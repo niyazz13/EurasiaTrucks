@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
-// Исправлены пути импорта для совместимости с GitHub Pages
+// Исправленные строки импорта — теперь строго с путями и расширением .js
 import { TRUCK_CATALOG, TRAILER_CATALOG, CARGO_DATABASE, SETTINGS } from './config.js';
 import { initAudioEngine, updateMotorSound, playBrakeSqueal, playTrafficHorn } from './audio.js';
 import { updateTrafficCarsAI } from './traffic.js';
-
 const canvas = document.getElementById('gameCanvas');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 3500);
