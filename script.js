@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
 // =========================================================================
-// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ)
+// БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ)
 // =========================================================================
 const TRUCK_CATALOG = [
     { id: "kamaz", name: "KamAZ 54901 Neo 🇷🇺", price: 0, maxSpeed: 1.5, fuelTank: 100, modelPath: "models/kamaz.glb", color: '#dc2626' },
@@ -28,7 +28,7 @@ const SETTINGS = {
     trafficUpdateInterval: 4000
 };
 // =========================================================================
-// 2. ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
+// ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
 // =========================================================================
 const canvas = document.getElementById('gameCanvas');
 const scene = new THREE.Scene();
@@ -72,7 +72,7 @@ let currentCountry = "Франция 🇫🇷";
 let cargoCoords = { x: 50, z: -40 }, destCoords = { x: -300, z: -250 }, gasCoords = { x: -60, z: -100 }, stoCoords = { x: 100, z: -20 };
 
 // =========================================================================
-// 🔊 3. ВСТРОЕННЫЕ ЗВУКОВЫЕ ЭФФЕКТЫ
+// ВСТРОЕННЫЕ ЗВУКОВЫЕ ЭФФЕКТЫ
 // =========================================================================
 let audioCtx = null; let motorOsc = null, motorGain = null;
 
@@ -98,7 +98,7 @@ function updateMotorSound(speed) {
 }
 
 // =========================================================================
-// 💾 4. ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ
 // =========================================================================
 window.buyTruck = function(id, price) {
     if (companyData.balance >= price) {
@@ -140,7 +140,7 @@ function loadGameProgress() {
 }
 
 // =========================================================================
-// 🗃️ 5. СБОРКА 3D ГЕОМЕТРИИ ФУРЫ
+// СБОРКА 3D ГЕОМЕТРИИ ФУРЫ
 // =========================================================================
 function buildComposition3D() {
     while(truckGroup.children.length > 0) { truckGroup.remove(truckGroup.children); }
@@ -189,7 +189,7 @@ if(!bought) div.querySelector('button').addEventListener('click', () => window.b
 }
 }
 // =========================================================================
-// 🚗 6. СИСТЕМА ИИ-ТРАФИКА
+// СИСТЕМА ИИ-ТРАФИКА
 // =========================================================================
 function updateTrafficCarsAI() {
 trafficCars.forEach((car, index) => {
@@ -212,7 +212,7 @@ trafficCars.push({ mesh, speed: 0.6, angle: Math.random()Math.PI2, stuckTimer: 0
 }
 }
 // =========================================================================
-// 🛣️ 7. КАРТЫ, ГРАНИЦЫ И ТАМОЖНЯ
+// КАРТЫ, ГРАНИЦЫ И ТАМОЖНЯ
 // =========================================================================
 function updateCountryBorderLogic(x, z) {
 if (x < -180 && z > -100) currentCountry = "Франция 🇫🇷";
@@ -307,7 +307,7 @@ document.getElementById('fuelVal').innerText = ${Math.ceil(companyData.truckStat
 document.getElementById('conditionVal').innerText = ${companyData.truckStats.condition}%;
 }
 // =========================================================================
-// 🎮 8. ИВЕНТЫ ВВОДА И КЛАВИШИ
+// ИВЕНТЫ ВВОДА И КЛАВИШИ
 // =========================================================================
 const keys = { w: false, a: false, s: false, d: false };
 window.addEventListener('keydown', (e) => { initAudioEngine(); if(audioCtx) audioCtx.resume(); const c = e.code.toLowerCase(); if (c === 'keyw') keys.w = true; if (c === 'keya') keys.a = true; if (c === 'keys') keys.s = true; if (c === 'keyd') keys.d = true; });
@@ -333,7 +333,7 @@ buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateSh
 }
 document.addEventListener('DOMContentLoaded', () => { if(loadGameProgress()) { buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateShopMenusUI(); } else { initRegistration(); } initTabsSystem(); });
 // =========================================================================
-// 🔄 9. ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
+// ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
 // =========================================================================
 function gameLoop() {
 requestAnimationFrame(gameLoop); if (!isCompanyRegistered) { renderer.render(scene, camera); return; }
