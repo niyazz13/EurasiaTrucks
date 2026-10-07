@@ -5,19 +5,16 @@
     -webkit-user-select: none;
     touch-action: none;
 }
-
 body, html {
     width: 100%; height: 100%;
     overflow: hidden;
     background-color: #020617;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-
 #gameCanvas {
     width: 100%; height: 100%;
     display: block;
 }
-
 #ui-container {
     position: absolute;
     top: 20px; left: 20px;
@@ -28,9 +25,8 @@ body, html {
     gap: 10px;
     max-height: 95vh;
 }
-
 .hud-panel {
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -40,7 +36,6 @@ body, html {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     width: 320px;
 }
-
 .hud-panel h2 {
     font-size: 11px;
     color: #38bdf8;
@@ -49,7 +44,6 @@ body, html {
     margin-bottom: 6px;
     margin-top: 4px;
 }
-
 .section-title {
     font-size: 10px;
     color: #94a3b8;
@@ -58,81 +52,43 @@ body, html {
     border-top: 1px solid rgba(255,255,255,0.05);
     padding-top: 4px;
 }
-
 .stats-row {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
     margin-bottom: 4px;
 }
-
 .stats-val { font-weight: bold; }
-
-/* ВКЛАДКИ */
 .tab-navigation {
-    display: flex;
-    gap: 4px;
-    width: 320px;
-    pointer-events: auto;
+    display: flex; gap: 4px; width: 320px; pointer-events: auto;
 }
-
 .tab-btn {
-    flex: 1;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255,255,255,0.05);
-    color: #94a3b8;
-    padding: 8px 4px;
-    font-size: 11px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+    flex: 1; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.05);
+    color: #94a3b8; padding: 8px 4px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold;
 }
-
 .tab-btn.active {
-    background: #2563eb;
-    color: white;
-    border-color: #3b82f6;
+    background: #2563eb; color: white; border-color: #3b82f6;
 }
-
 .hidden { display: none !important; }
 .scrollable-list {
-    max-height: 25vh;
-    overflow-y: auto;
-    margin-top: 5px;
-    pointer-events: auto;
+    max-height: 25vh; overflow-y: auto; margin-top: 5px; pointer-events: auto;
 }
-
-/* КАРТОЧКИ ТЕХНИКИ */
 .shop-item-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 10px; border-radius: 8px; margin-bottom: 6px; display: flex;
+    justify-content: space-between; align-items: center; font-size: 12px;
 }
-.card-info span { display: block; font-size: 10px; color: #94a3b8; margin-top: 2px; }
-
 .buy-card-btn {
-    background: #10b981; color: white; border: none;
-    padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer;
+    background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer;
 }
 .buy-card-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-
 .action-btn {
-    width: 100%; background: #2563eb; color: white; border: none;
-    padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer;
+    width: 100%; background: #2563eb; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer;
 }
-
-/* МОДАЛЬНОЕ ОКНО */
 #registration-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px); display: flex;
-    align-items: center; justify-content: center; z-index: 100;
+    background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
 }
 .reg-modal {
     background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.2);
@@ -143,13 +99,11 @@ body, html {
 .form-group { text-align: left; margin-bottom: 12px; }
 .form-group label { display: block; font-size: 11px; margin-bottom: 4px; color: #cbd5e1; }
 .form-group input {
-    width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.1);
-    padding: 8px 12px; border-radius: 6px; color: white; outline: none;
+    width: 100%; background: #020617; border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; color: white; outline: none;
 }
 .logo-selector { display: flex; gap: 8px; }
 .logo-btn {
-    flex: 1; background: #020617; border: 1px solid rgba(255,255,255,0.1);
-    padding: 8px; font-size: 16px; border-radius: 6px; cursor: pointer; color: white;
+    flex: 1; background: #020617; border: 1px solid rgba(255,255,255,0.1); padding: 8px; font-size: 16px; border-radius: 6px; cursor: pointer; color: white;
 }
 .logo-btn.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
 .gift-box { background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.15); padding: 10px; border-radius: 8px; font-size: 11px; text-align: left; margin-bottom: 16px; }
