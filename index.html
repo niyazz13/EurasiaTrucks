@@ -1,1 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no, viewport-fit=cover">
+    <title>3D Евразия Pro: Международная Логистика</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com"
+            }
+        }
+    </script>
+</head>
+<body>
 
+    <!-- СТАРТОВОЕ ОКНО РЕГИСТРАЦИИ КОМПАНИИ -->
+    <div id="registration-overlay">
+        <div class="reg-modal">
+            <h2>Регистрация Транспортной Корпорации</h2>
+            <p>Зарегистрируйте ваше предприятие для получения международной лицензии на грузоперевозки по Евразии.</p>
+            
+            <div class="form-group">
+                <label for="companyNameInput">Название транспортной компании:</label>
+                <input type="text" id="companyNameInput" placeholder="Например: EuroTrans" maxlength="20">
+            </div>
+
+            <div class="form-group">
+                <label>Стартовый логотип:</label>
+                <div class="logo-selector">
+                    <button class="logo-btn active" data-logo="🚚">🚚</button>
+                    <button class="logo-btn" data-logo="🌐">🌐</button>
+                    <button class="logo-btn" data-logo="📦">📦</button>
+                    <button class="logo-btn" data-logo="⚡">⚡</button>
+                </div>
+            </div>
+
+            <div class="gift-box">
+                <strong>🎁 Стартовый пакет:</strong>
+                <span>Тягач KamAZ Эко, Бортовой прицеп, лицензия и $5,000 на баланс!</span>
+            </div>
+
+            <button id="startCompanyBtn" class="reg-submit-btn">Открыть Компанию</button>
+        </div>
+    </div>
+
+    <!-- ТРЕХМЕРНЫЙ МИР -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ИГРОВОЙ ИНТЕРФЕЙС HUD -->
+    <div id="ui-container">
+        <!-- Главная информационная панель -->
+        <div class="hud-panel main-panel">
+            <h1 id="hudCompanyName">Транспортная Компания</h1>
+            <div class="stats-row">
+                <span>Капитал:</span>
+                <span id="balanceVal" class="stats-val" style="color: #22c55e; font-size: 15px;">$5,000</span>
+            </div>
+            <div class="stats-row">
+                <span>Пассивный доход:</span>
+                <span id="passiveIncomeVal" class="stats-val" style="color: #60a5fa;">+$0 / мин</span>
+            </div>
+            <div class="stats-row">
+                <span>Страна / Обстановка:</span>
+                <span id="countryVal" class="stats-val" style="color: #a855f7;">Франция 🇫🇷</span>
+            </div>
+            <div class="stats-row">
+                <span>Дороги:</span>
+                <span id="trafficTrafficVal" class="stats-val" style="color: #22c55e;">Свободно</span>
+            </div>
+            <div class="stats-row">
+                <span>Координаты:</span>
+                <span id="coordsVal" class="stats-val" style="font-family: monospace; color: #94a3b8; font-size: 11px;">48.8584, 2.2945</span>
+            </div>
+        </div>
+
+        <!-- Переключатель вкладок управления бизнесом -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="tab-status">📊 Статус</button>
+            <button class="tab-btn" data-tab="tab-garage">🗄️ Гараж</button>
+            <button class="tab-btn" data-tab="tab-shop-trucks">🛒 Магазины</button>
+            <button class="tab-btn" data-tab="tab-drivers">💼 Наём</button>
+        </div>
+
+        <!-- Вкладка 1: Статус рейса -->
+        <div class="hud-panel tab-content active" id="tab-status">
+            <h2>Датчики выбранного состава</h2>
+            <div class="stats-row">
+                <span>Тягач:</span>
+                <span id="hudTruckName" class="stats-val">Загрузка...</span>
+            </div>
+            <div class="stats-row">
+                <span>Прицеп:</span>
+                <span id="hudTrailerName" class="stats-val">Загрузка...</span>
+            </div>
+            <div class="stats-row">
+                <span>Топливо в баке:</span>
+                <span id="fuelVal" class="stats-val" style="color: #fbbf24;">100%</span>
+            </div>
+            <div class="stats-row">
+                <span>Износ (СТО):</span>
+                <span id="conditionVal" class="stats-val" style="color: #4ade80;">100%</span>
+            </div>
+            
+            <h2 class="section-title">Сопроводительные документы</h2>
+            <div class="stats-row">
+                <span>Накладная CMR:</span>
+                <span id="docCmr" class="stats-val" style="font-size: 11px;">Отсутствует</span>
+            </div>
+            <div class="stats-row">
+                <span>Статус таможни:</span>
+                <span id="customsStatus" class="stats-val" style="color: #eab308;">Свободный путь</span>
+            </div>
+            <div class="stats-row" style="margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 5px;">
+                <span>GPS Навигатор:</span>
+                <span id="taskVal" class="stats-val" style="color: #38bdf8;">Завершите регистрацию</span>
+            </div>
+        </div>
+
+        <!-- Вкладка 2: Мой Гараж -->
+        <div class="hud-panel tab-content hidden" id="tab-garage">
+            <h2>Ваш активный автопарк</h2>
+            <div id="garageList" class="scrollable-list"></div>
+            <button id="switchCompositionBtn" class="action-btn" style="margin-top: 8px;">Сесть за руль состава</button>
+        </div>
+
+        <!-- Вкладка 3: Автосалоны -->
+        <div class="hud-panel tab-content hidden" id="tab-shop-trucks">
+            <h2>Дилеры грузовиков</h2>
+            <div id="truckShopList" class="scrollable-list" style="max-height: 14vh;"></div>
+            <h2 class="section-title">Заводы полуприцепов</h2>
+            <div id="trailerShopList" class="scrollable-list" style="max-height: 14vh;"></div>
+        </div>
+
+        <!-- Вкладка 4: Биржа Труда (Наём водителей) -->
+        <div class="hud-panel tab-content hidden" id="tab-drivers">
+            <h2>Биржа труда: Водители-NPC</h2>
+            <p style="font-size: 10px; color: #94a3b8; margin-bottom: 5px; line-height: 1.2;">Каждый нанятый водитель берет свободную машину из вашего гаража и возит автоматические рейсы.</p>
+            <div id="driversLaborList" class="scrollable-list" style="max-height: 25vh;"></div>
+        </div>
+    </div>
+
+    <!-- Подключаем основной скрипт -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
