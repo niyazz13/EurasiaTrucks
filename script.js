@@ -192,9 +192,17 @@ div.innerHTML = <div class="card-info"><b>${t.name}</b></div><button class="buy-
 if(!bought) div.querySelector('button').addEventListener('click', () => window.buyTruck(t.id, t.price)); tList.appendChild(div);
 });
 }
+const trList = document.getElementById('trailerShopList'); if(trList) {
+trList.innerHTML = "";
+TRAILER_CATALOG.forEach(tr => {
+const bought = companyData.ownedTrailers.includes(tr.id); const div = document.createElement('div'); div.className = "shop-item-card";
+div.innerHTML = <div class="card-info"><b>${tr.name}</b></div><button class="buy-card-btn" ${bought?'disabled':''}>${bought?'Куплен':'$'+tr.price}</button>;
+if(!bought) div.querySelector('button').addEventListener('click', () => window.buyTrailer(tr.id, tr.price)); trList.appendChild(div);
+});
+}
 }
 // =========================================================================
-// 🚗 6. СИСТЕМА ИИ-ТРАФИКА (АРГУМЕНТЫ ИСПРАВЛЕНЫ)
+// 🚗 6. СИСТЕМА ИИ-ТРАФИКА
 // =========================================================================
 function updateTrafficCarsAI() {
 trafficCars.forEach((car, index) => {
@@ -271,6 +279,7 @@ document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getE
 updateShopMenusUI(); saveGameProgress(); alert("💰 Рейс выполнен успешно!");
 }
 }
+function resetCurrentCargo() { companyData.hasOrder = false; cargoHubMarker.material.opacity = 0.5; destinationHubMarker.material.opacity = 0.0; document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getElementById('docCmr').innerText = "Отсутствует"; }
 let loadedChunks = new Set();
 async function loadRealOSMData(lat, lon) {
 const offset = 0.005; const minLat = lat - offset; const maxLat = lat + offset; const minLon = lon - offset; const maxLon = lon + offset;
@@ -367,7 +376,6 @@ if (!checkCollision(nextX, truckGroup.position.z)) truckGroup.position.x = nextX
 const nextZ = truckGroup.position.z + stepZ;
 if (!checkCollision(truckGroup.position.x, nextZ)) truckGroup.position.z = nextZ; else { truckPhysics.speed *= -0.3; companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); }
 truckGroup.rotation.y = truckPhysics.angle;
-// Функция ИИ-трафика теперь вызывается корректно без лишних аргументов
 updateTrafficCarsAI();
 updateCountryBorderLogic(truckGroup.position.x, truckGroup.position.z);
 updateCustomsControl(); updateGPSAndServicesLogic(); processLogisticsLogic();
