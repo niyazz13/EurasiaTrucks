@@ -34,12 +34,13 @@
                 <span>Тягач KamAZ Эко, Шторный прицеп Schmitz и $5,000 на баланс!</span>
             </div>
 
-            <button id="startCompanyBtn" class="reg-submit-btn">Открыть Компанию</button>
+                        <!-- Замените кнопку в самом низу формы на этот вариант -->
+            <button id="startCompanyBtn" class="reg-submit-btn" onclick="document.getElementById('registration-overlay').style.display='none';">Открыть Компанию</button>
         </div>
     </div>
 
-    <!-- ТРЕХМЕРНЫЙ МИР -->
     <canvas id="gameCanvas"></canvas>
+    <!-- Код HUD и вкладок остается прежним -->
 
     <!-- СТРАТЕГИЧЕСКИЙ HUD И ПАНЕЛИ УПРАВЛЕНИЯ -->
     <div id="ui-container">
