@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=no, viewport-fit=cover">
-    <title>3D Евразия: Международная Логистика</title>
+    <title>3D Евразия: Транспортная Корпорация</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -34,17 +34,15 @@
                 <span>Тягач KamAZ Эко, Шторный прицеп Schmitz и $5,000 на баланс!</span>
             </div>
 
-                        <!-- Замените кнопку в самом низу формы на этот вариант -->
-            <button id="startCompanyBtn" class="reg-submit-btn" onclick="document.getElementById('registration-overlay').style.display='none';">Открыть Компанию</button>
+            <button id="startCompanyBtn" class="reg-submit-btn">Открыть Компанию</button>
         </div>
     </div>
 
+    <!-- ТРЕХМЕРНЫЙ МИР -->
     <canvas id="gameCanvas"></canvas>
-    <!-- Код HUD и вкладок остается прежним -->
 
     <!-- СТРАТЕГИЧЕСКИЙ HUD И ПАНЕЛИ УПРАВЛЕНИЯ -->
     <div id="ui-container">
-        <!-- Главная информационная панель -->
         <div class="hud-panel main-panel">
             <h1 id="hudCompanyName">Транспортная Компания</h1>
             <div class="stats-row">
@@ -65,24 +63,17 @@
             </div>
         </div>
 
-        <!-- Переключатель вкладок управления бизнесом -->
         <div class="tab-navigation">
             <button class="tab-btn active" data-tab="tab-status">📊 Статус</button>
             <button class="tab-btn" data-tab="tab-garage">🗄️ Гараж</button>
             <button class="tab-btn" data-tab="tab-shop-trucks">🛒 Тягачи</button>
-            <button class="tab-btn" data-tab="tab-shop-trailers">📦 Прицепы</button>
         </div>
 
-        <!-- Контенты вкладок -->
         <div class="hud-panel tab-content active" id="tab-status">
             <h2>Датчики выбранного состава</h2>
             <div class="stats-row">
                 <span>Тягач:</span>
                 <span id="hudTruckName" class="stats-val">Загрузка...</span>
-            </div>
-            <div class="stats-row">
-                <span>Прицеп:</span>
-                <span id="hudTrailerName" class="stats-val">Загрузка...</span>
             </div>
             <div class="stats-row">
                 <span>Топливо в баке:</span>
@@ -98,10 +89,6 @@
                 <span>Накладная CMR:</span>
                 <span id="docCmr" class="stats-val" style="font-size: 11px;">Отсутствует</span>
             </div>
-            <div class="stats-row">
-                <span>Статус таможни:</span>
-                <span id="customsStatus" class="stats-val" style="color: #eab308;">Вне зоны контроля</span>
-            </div>
             <div class="stats-row" style="margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 5px;">
                 <span>GPS Навигатор:</span>
                 <span id="taskVal" class="stats-val" style="color: #38bdf8;">Завершите регистрацию</span>
@@ -112,26 +99,20 @@
             </div>
         </div>
 
-        <!-- Вкладка: Мой Гараж -->
         <div class="hud-panel tab-content hidden" id="tab-garage">
             <h2>Ваш активный автопарк</h2>
             <div id="garageList" class="scrollable-list"></div>
         </div>
 
-        <!-- Вкладка: Автосалон Тягачей -->
         <div class="hud-panel tab-content hidden" id="tab-shop-trucks">
             <h2>Дилеры грузовиков Евразии</h2>
             <div id="truckShopList" class="scrollable-list"></div>
         </div>
-
-        <!-- Вкладка: Магазин Полуприцепов -->
-        <div class="hud-panel tab-content hidden" id="tab-shop-trailers">
-            <h2>Заводы полуприцепов</h2>
-            <div id="trailerShopList" class="scrollable-list"></div>
-        </div>
     </div>
-    
-    <!-- Исправленный тег подключения основного скрипта -->
-    <script type="module" src="./script.js"></script>
+
+    <!-- Подключение Three.js через CDN -->
+    <script src="https://cloudflare.com"></script>
+    <!-- Подключение главного автономного скрипта -->
+    <script src="./script.js"></script>
 </body>
 </html>
