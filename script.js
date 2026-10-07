@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
 
 // =========================================================================
-// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ ФАЙЛА ДЛЯ ИСКЛЮЧЕНИЯ ОШИБОК)
+// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ)
 // =========================================================================
 const TRUCK_CATALOG = [
     { id: "kamaz", name: "KamAZ 54901 Neo 🇷🇺", price: 0, maxSpeed: 1.5, fuelTank: 100, modelPath: "models/kamaz.glb", color: '#dc2626' },
@@ -103,7 +103,7 @@ function updateMotorSound(speed) {
 }
 
 // =========================================================================
-// 💾 4. ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ (ОБЯЗАТЕЛЬНО В WINDOW)
+// 💾 4. ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ
 // =========================================================================
 window.buyTruck = function(id, price) {
     if (companyData.balance >= price) {
@@ -180,8 +180,8 @@ function updateShopMenusUI() {
     TRUCK_CATALOG.forEach(t => {
         if (companyData.ownedTrucks.includes(t.id)) {
             const div = document.createElement('div'); div.className = "shop-item-card";
-div.innerHTML = <div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn">Взять</button>;
-div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
+            div.innerHTML = `<div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn">Взять</button>`;
+            div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
 }
 });
 const tList = document.getElementById('truckShopList'); if(tList) {
@@ -239,7 +239,7 @@ const dist = truckGroup.position.distanceTo(kpp.position);
 if (dist < kpp.radius) {
 if (companyData.hasOrder && !kpp.isCleared) {
 truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, 0.2); kpp.timer += 1;
-if (kpp.timer > 80) { kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e'); }
+if (kpp.timer > 100) { kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e'); }
 } else if (!companyData.hasOrder) { kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e'); }
 } else if (dist > kpp.radius + 15 && kpp.isCleared) {
 kpp.isCleared = false; kpp.timer = 0; kpp.barrierMesh.rotation.z = 0; kpp.zoneMesh.material.color.set('#ef4444');
@@ -256,7 +256,7 @@ function processLogisticsLogic() {
 const distToCargo = truckGroup.position.distanceTo(new THREE.Vector3(cargoCoords.x, truckGroup.position.y, cargoCoords.z));
 const distToDest = truckGroup.position.distanceTo(new THREE.Vector3(destCoords.x, truckGroup.position.y, destCoords.z));
 if (!companyData.hasOrder && distToCargo < 6.0) {
-const contract = CARGO_DATABASE[0];
+const contract = CARGO_DATABASE[Math.floor(Math.random() * CARGO_DATABASE.length)];
 companyData.hasOrder = true; companyData.payout = contract.pay;
 document.getElementById('docCmr').innerText = CMR | ${contract.name};
 document.getElementById('cargoVal').innerText = contract.name;
@@ -270,8 +270,8 @@ document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getE
 updateShopMenusUI(); saveGameProgress(); alert("💰 Рейс выполнен успешно!");
 }
 }
+function resetCurrentCargo() { companyData.hasOrder = false; cargoHubMarker.material.opacity = 0.5; destinationHubMarker.material.opacity = 0.0; document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getElementById('docCmr').innerText = "Отсутствует"; }
 let loadedChunks = new Set();
-let totalBuildings = 0;
 async function loadRealOSMData(lat, lon) {
 const offset = 0.005; const minLat = lat - offset; const maxLat = lat + offset; const minLon = lon - offset; const maxLon = lon + offset;
 const chunkKey = ${minLat.toFixed(2)}_${minLon.toFixed(2)}; if (loadedChunks.has(chunkKey)) return; loadedChunks.add(chunkKey);
@@ -288,11 +288,14 @@ if (points.length < 3) return;
 const geom = new THREE.ExtrudeGeometry(new THREE.Shape(points), { steps: 1, depth: 15, bevelEnabled: false }); geom.rotateX(Math.PI / 2);
 const bMesh = new THREE.Mesh(geom, buildingMat); bMesh.castShadow = true; bMesh.receiveShadow = true; scene.add(bMesh);
 bMesh.geometry.computeBoundingBox(); colliders.push(new THREE.Box3().copy(bMesh.geometry.boundingBox));
-totalBuildings++; const bCount = document.getElementById('buildingsCount'); if(bCount) bCount.innerText = totalBuildings;
+totalBuildings++;
+const bCountElement = document.getElementById('buildingsCount');
+if(bCountElement) bCountElement.innerText = totalBuildings;
 }
 });
 } catch (err) {}
 }
+let totalBuildings = 0;
 function checkCollision(targetX, targetZ) {
 for (let i = 0; i < colliders.length; i++) {
 const box = colliders[i];
@@ -309,7 +312,7 @@ document.getElementById('fuelVal').innerText = ${Math.ceil(companyData.truckStat
 document.getElementById('conditionVal').innerText = ${companyData.truckStats.condition}%;
 }
 // =========================================================================
-// 🎮 8. ИВЕНТЫ ВВОДА
+// 🎮 8. ИВЕНТЫ ВВОДА И КЛАВИШИ
 // =========================================================================
 const keys = { w: false, a: false, s: false, d: false };
 window.addEventListener('keydown', (e) => { initAudioEngine(); if(audioCtx) audioCtx.resume(); const c = e.code.toLowerCase(); if (c === 'keyw') keys.w = true; if (c === 'keya') keys.a = true; if (c === 'keys') keys.s = true; if (c === 'keyd') keys.d = true; });
@@ -335,7 +338,7 @@ buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateSh
 }
 document.addEventListener('DOMContentLoaded', () => { if(loadGameProgress()) { buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateShopMenusUI(); } else { initRegistration(); } initTabsSystem(); });
 // =========================================================================
-// 🔄 9. ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
+// 🔄 9. ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
 // =========================================================================
 function gameLoop() {
 requestAnimationFrame(gameLoop); if (!isCompanyRegistered) { renderer.render(scene, camera); return; }
@@ -354,8 +357,8 @@ companyData.truckStats.fuel -= SETTINGS.fuelUsageSpeed * 0.7;
 } else { truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, truckPhysics.deceleration); }
 if (Math.abs(truckPhysics.speed) > 0.05) {
 const dir = truckPhysics.speed > 0 ? 1 : -1;
-if (keys.a || (touchData.moveId !== null && truckData.activeMoveX < -0.1)) truckPhysics.angle += truckPhysics.rotationSpeed * dir;
-if (keys.d || (touchData.moveId !== null && truckData.activeMoveX > 0.1)) truckPhysics.angle -= truckPhysics.rotationSpeed * dir;
+if (keys.a || (touchData.moveId !== null && touchData.activeMoveX < -0.1)) truckPhysics.angle += truckPhysics.rotationSpeed * dir;
+if (keys.d || (touchData.moveId !== null && touchData.activeMoveX > 0.1)) truckPhysics.angle -= truckPhysics.rotationSpeed * dir;
 }
 updateMotorSound(truckPhysics.speed);
 const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
