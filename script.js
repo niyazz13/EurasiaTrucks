@@ -360,7 +360,6 @@ companyData.truckStats.fuel -= SETTINGS.fuelUsageSpeed;
 truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, -currentTruckConfig.maxSpeed * 0.4, truckPhysics.acceleration);
 companyData.truckStats.fuel -= SETTINGS.fuelUsageSpeed * 0.7;
 } else { truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, truckPhysics.deceleration); }
-} else { truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, truckPhysics.deceleration); }
 if (Math.abs(truckPhysics.speed) > 0.05) {
 const dir = truckPhysics.speed > 0 ? 1 : -1;
 if (keys.a || (touchData.moveId !== null && touchData.activeMoveX < -0.1)) truckPhysics.angle += truckPhysics.rotationSpeed * dir;
@@ -370,9 +369,6 @@ updateMotorSound(truckPhysics.speed);
 const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
 const nextX = truckGroup.position.x + stepX;
 if (!checkCollision(nextX, truckGroup.position.z)) truckGroup.position.x = nextX; else { truckPhysics.speed *= -0.3; companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); }
-const nextZ = truckGroup.position.z + stepZ;
-if (!checkCollision(truckGroup.position.x, nextZ)) truckGroup.position.z = nextZ; else { truckPhysics.speed *= -0.3; companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); }
-truckGroup.rotation.y = truckPhysics.angle;
 updateTrafficCarsAI();
 updateCountryBorderLogic(truckGroup.position.x, truckGroup.position.z);
 updateCustomsControl(); updateGPSAndServicesLogic(); processLogisticsLogic();
@@ -385,3 +381,4 @@ camera.lookAt(truckGroup.position.x, truckGroup.position.y, truckGroup.position.
 renderer.render(scene, camera);
 }
 gameLoop();
+    
