@@ -369,6 +369,7 @@ updateMotorSound(truckPhysics.speed);
         // ИСПРАВЛЕННЫЙ ВАРИАНТ СТРОК 369 И 370:
     const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; 
     const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
+    
     const nextX = truckGroup.position.x + stepX;
     if (!checkCollision(nextX, truckGroup.position.z)) {
         truckGroup.position.x = nextX; 
