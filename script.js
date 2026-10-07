@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
-
 // =========================================================================
 // ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ)
 // =========================================================================
@@ -9,19 +8,16 @@ const TRUCK_CATALOG = [
     { id: "scania", name: "Scania S730 V8 King 🇸🇪", price: 2800, maxSpeed: 2.1, fuelTank: 140, modelPath: "models/scania.glb", color: '#2563eb' },
     { id: "volvo", name: "Volvo FH16 Globetrotter 🇳🇴", price: 4500, maxSpeed: 2.4, fuelTank: 180, modelPath: "models/volvo.glb", color: '#10b981' }
 ];
-
 const TRAILER_CATALOG = [
     { id: "flatbed", name: "Шторный Тент Schmitz 📑", price: 0, type: "Стандарт", modelPath: "models/schmitz.glb", desc: "Для обычных грузов" },
     { id: "refrigerated", name: "Рефрижератор Krone ❄️", price: 1500, type: "Скоропортящийся", modelPath: "models/krone.glb", desc: "Дорогие продукты" },
     { id: "tanker", name: "Химическая Цистерна 🧪", price: 3200, type: "Опасный (ADR)", modelPath: "models/tanker.glb", desc: "Опасные химикаты" }
 ];
-
 const CARGO_DATABASE = [
     { name: "Свежие Яблоки в Берлин 🍏", pay: 600, reqType: "Стандарт", weight: "8 т" },
     { name: "Замороженная Рыба в Рим 🐟", pay: 1100, reqType: "Скоропортящийся", weight: "12 т" },
     { name: "Промышленные Кислоты в Лодзь 🧪", pay: 2300, reqType: "Опасный (ADR)", weight: "22 т" }
 ];
-
 const SETTINGS = {
     fuelUsageSpeed: 0.005,
     crashDamagePercent: 5,
@@ -31,7 +27,6 @@ const SETTINGS = {
     roadWorksChance: 0.10,
     trafficUpdateInterval: 4000
 };
-
 // =========================================================================
 // 2. ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
 // =========================================================================
