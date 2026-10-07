@@ -1,23 +1,27 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
+
 // =========================================================================
-// БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ)
+// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ ФАЙЛА)
 // =========================================================================
 const TRUCK_CATALOG = [
     { id: "kamaz", name: "KamAZ 54901 Neo 🇷🇺", price: 0, maxSpeed: 1.5, fuelTank: 100, modelPath: "models/kamaz.glb", color: '#dc2626' },
     { id: "scania", name: "Scania S730 V8 King 🇸🇪", price: 2800, maxSpeed: 2.1, fuelTank: 140, modelPath: "models/scania.glb", color: '#2563eb' },
     { id: "volvo", name: "Volvo FH16 Globetrotter 🇳🇴", price: 4500, maxSpeed: 2.4, fuelTank: 180, modelPath: "models/volvo.glb", color: '#10b981' }
 ];
+
 const TRAILER_CATALOG = [
     { id: "flatbed", name: "Шторный Тент Schmitz 📑", price: 0, type: "Стандарт", modelPath: "models/schmitz.glb", desc: "Для обычных грузов" },
     { id: "refrigerated", name: "Рефрижератор Krone ❄️", price: 1500, type: "Скоропортящийся", modelPath: "models/krone.glb", desc: "Дорогие продукты" },
     { id: "tanker", name: "Химическая Цистерна 🧪", price: 3200, type: "Опасный (ADR)", modelPath: "models/tanker.glb", desc: "Опасные химикаты" }
 ];
+
 const CARGO_DATABASE = [
     { name: "Свежие Яблоки в Берлин 🍏", pay: 600, reqType: "Стандарт", weight: "8 т" },
     { name: "Замороженная Рыба в Рим 🐟", pay: 1100, reqType: "Скоропортящийся", weight: "12 т" },
     { name: "Промышленные Кислоты в Лодзь 🧪", pay: 2300, reqType: "Опасный (ADR)", weight: "22 т" }
 ];
+
 const SETTINGS = {
     fuelUsageSpeed: 0.005,
     crashDamagePercent: 5,
@@ -27,8 +31,9 @@ const SETTINGS = {
     roadWorksChance: 0.10,
     trafficUpdateInterval: 4000
 };
+
 // =========================================================================
-// ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
+// 2. ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
 // =========================================================================
 const canvas = document.getElementById('gameCanvas');
 const scene = new THREE.Scene();
@@ -72,7 +77,7 @@ let currentCountry = "Франция 🇫🇷";
 let cargoCoords = { x: 50, z: -40 }, destCoords = { x: -300, z: -250 }, gasCoords = { x: -60, z: -100 }, stoCoords = { x: 100, z: -20 };
 
 // =========================================================================
-// ВСТРОЕННЫЕ ЗВУКОВЫЕ ЭФФЕКТЫ
+// 🔊 3. ВСТРОЕННЫЕ ЗВУКОВЫЕ ЭФФЕКТЫ
 // =========================================================================
 let audioCtx = null; let motorOsc = null, motorGain = null;
 
@@ -98,7 +103,7 @@ function updateMotorSound(speed) {
 }
 
 // =========================================================================
-// ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ
+// 💾 4. ГЛОБАЛЬНЫЕ ФУНКЦИИ КНОПОК И СОХРАНЕНИЙ
 // =========================================================================
 window.buyTruck = function(id, price) {
     if (companyData.balance >= price) {
@@ -140,7 +145,7 @@ function loadGameProgress() {
 }
 
 // =========================================================================
-// СБОРКА 3D ГЕОМЕТРИИ ФУРЫ
+// 🗃️ 5. СБОРКА 3D ГЕОМЕТРИИ ФУРЫ
 // =========================================================================
 function buildComposition3D() {
     while(truckGroup.children.length > 0) { truckGroup.remove(truckGroup.children); }
@@ -176,7 +181,7 @@ function updateShopMenusUI() {
         if (companyData.ownedTrucks.includes(t.id)) {
             const div = document.createElement('div'); div.className = "shop-item-card";
             div.innerHTML = `<div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn">Взять</button>`;
-            div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
+div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
 }
 });
 const tList = document.getElementById('truckShopList'); if(tList) {
@@ -189,7 +194,7 @@ if(!bought) div.querySelector('button').addEventListener('click', () => window.b
 }
 }
 // =========================================================================
-// СИСТЕМА ИИ-ТРАФИКА
+// 🚗 6. СИСТЕМА ИИ-ТРАФИКА (АРГУМЕНТЫ ИСПРАВЛЕНЫ)
 // =========================================================================
 function updateTrafficCarsAI() {
 trafficCars.forEach((car, index) => {
@@ -212,7 +217,7 @@ trafficCars.push({ mesh, speed: 0.6, angle: Math.random()Math.PI2, stuckTimer: 0
 }
 }
 // =========================================================================
-// КАРТЫ, ГРАНИЦЫ И ТАМОЖНЯ
+// 🛣️ 7. КАРТЫ, ГРАНИЦЫ И ТАМОЖНЯ
 // =========================================================================
 function updateCountryBorderLogic(x, z) {
 if (x < -180 && z > -100) currentCountry = "Франция 🇫🇷";
@@ -250,6 +255,7 @@ destinationHubMarker = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.5, 16),
 function processLogisticsLogic() {
 const distToCargo = truckGroup.position.distanceTo(new THREE.Vector3(cargoCoords.x, truckGroup.position.y, cargoCoords.z));
 const distToDest = truckGroup.position.distanceTo(new THREE.Vector3(destCoords.x, truckGroup.position.y, destCoords.z));
+const currentTrailer = TRAILER_CATALOG.find(t => t.id === companyData.selectedTrailerId);
 if (!companyData.hasOrder && distToCargo < 6.0) {
 const contract = CARGO_DATABASE[Math.floor(Math.random() * CARGO_DATABASE.length)];
 companyData.hasOrder = true; companyData.payout = contract.pay;
@@ -265,7 +271,6 @@ document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getE
 updateShopMenusUI(); saveGameProgress(); alert("💰 Рейс выполнен успешно!");
 }
 }
-function resetCurrentCargo() { companyData.hasOrder = false; cargoHubMarker.material.opacity = 0.5; destinationHubMarker.material.opacity = 0.0; document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getElementById('docCmr').innerText = "Отсутствует"; }
 let loadedChunks = new Set();
 async function loadRealOSMData(lat, lon) {
 const offset = 0.005; const minLat = lat - offset; const maxLat = lat + offset; const minLon = lon - offset; const maxLon = lon + offset;
@@ -307,7 +312,7 @@ document.getElementById('fuelVal').innerText = ${Math.ceil(companyData.truckStat
 document.getElementById('conditionVal').innerText = ${companyData.truckStats.condition}%;
 }
 // =========================================================================
-// ИВЕНТЫ ВВОДА И КЛАВИШИ
+// 🎮 8. ИВЕНТЫ ВВОДА И КЛАВИШИ
 // =========================================================================
 const keys = { w: false, a: false, s: false, d: false };
 window.addEventListener('keydown', (e) => { initAudioEngine(); if(audioCtx) audioCtx.resume(); const c = e.code.toLowerCase(); if (c === 'keyw') keys.w = true; if (c === 'keya') keys.a = true; if (c === 'keys') keys.s = true; if (c === 'keyd') keys.d = true; });
@@ -333,7 +338,7 @@ buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateSh
 }
 document.addEventListener('DOMContentLoaded', () => { if(loadGameProgress()) { buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateShopMenusUI(); } else { initRegistration(); } initTabsSystem(); });
 // =========================================================================
-// ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
+// 🔄 9. ГЛАВНЫЙ ИГРОВОЙ ЦИКЛ ОБНОВЛЕНИЯ
 // =========================================================================
 function gameLoop() {
 requestAnimationFrame(gameLoop); if (!isCompanyRegistered) { renderer.render(scene, camera); return; }
@@ -362,6 +367,7 @@ if (!checkCollision(nextX, truckGroup.position.z)) truckGroup.position.x = nextX
 const nextZ = truckGroup.position.z + stepZ;
 if (!checkCollision(truckGroup.position.x, nextZ)) truckGroup.position.z = nextZ; else { truckPhysics.speed *= -0.3; companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); }
 truckGroup.rotation.y = truckPhysics.angle;
+// Функция ИИ-трафика теперь вызывается корректно без лишних аргументов
 updateTrafficCarsAI();
 updateCountryBorderLogic(truckGroup.position.x, truckGroup.position.z);
 updateCustomsControl(); updateGPSAndServicesLogic(); processLogisticsLogic();
