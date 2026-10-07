@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
 
 // =========================================================================
-// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ (ВСТРОЕНО ВНУТРЬ ФАЙЛА)
+// ⚙️ 1. БАЗА ДАННЫХ И НАСТРОЙКИ
 // =========================================================================
 const TRUCK_CATALOG = [
     { id: "kamaz", name: "KamAZ 54901 Neo 🇷🇺", price: 0, maxSpeed: 1.5, fuelTank: 100, modelPath: "models/kamaz.glb", color: '#dc2626' },
@@ -263,7 +263,6 @@ destinationHubMarker = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.5, 16),
 function processLogisticsLogic() {
 const distToCargo = truckGroup.position.distanceTo(new THREE.Vector3(cargoCoords.x, truckGroup.position.y, cargoCoords.z));
 const distToDest = truckGroup.position.distanceTo(new THREE.Vector3(destCoords.x, truckGroup.position.y, destCoords.z));
-const currentTrailer = TRAILER_CATALOG.find(t => t.id === companyData.selectedTrailerId);
 if (!companyData.hasOrder && distToCargo < 6.0) {
 const contract = CARGO_DATABASE[Math.floor(Math.random() * CARGO_DATABASE.length)];
 companyData.hasOrder = true; companyData.payout = contract.pay;
@@ -273,10 +272,8 @@ document.getElementById('taskVal').innerText = "Следуйте по GPS!";
 cargoHubMarker.material.opacity = 0.0; destinationHubMarker.material.opacity = 0.5;
 }
 if (companyData.hasOrder && distToDest < 6.0) {
-companyData.balance += companyData.payout; companyData.hasOrder = false;
-cargoHubMarker.material.opacity = 0.5; destinationHubMarker.material.opacity = 0.0;
-document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getElementById('docCmr').innerText = "Отсутствует";
-updateShopMenusUI(); saveGameProgress(); alert("💰 Рейс выполнен успешно!");
+companyData.balance += companyData.payout; resetCurrentCargo(); updateShopMenusUI(); saveGameProgress();
+alert("💰 Рейс выполнен успешно!");
 }
 }
 function resetCurrentCargo() { companyData.hasOrder = false; cargoHubMarker.material.opacity = 0.5; destinationHubMarker.material.opacity = 0.0; document.getElementById('cargoVal').innerText = "Пусто 🚫"; document.getElementById('docCmr').innerText = "Отсутствует"; }
@@ -367,7 +364,7 @@ companyData.truckStats.fuel -= SETTINGS.fuelUsageSpeed * 0.7;
 if (Math.abs(truckPhysics.speed) > 0.05) {
 const dir = truckPhysics.speed > 0 ? 1 : -1;
 if (keys.a || (touchData.moveId !== null && touchData.activeMoveX < -0.1)) truckPhysics.angle += truckPhysics.rotationSpeed * dir;
-if (keys.d || (touchData.moveId !== null && touchData.activeMoveX > 0.1)) truckPhysics.angle -= truckPhysics.rotationSpeed * dir;
+if (keys.d || (touchData.moveId !== null && truckData.activeMoveX > 0.1)) truckPhysics.angle -= truckPhysics.rotationSpeed * dir;
 }
 updateMotorSound(truckPhysics.speed);
 const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
