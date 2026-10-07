@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com';
-import { TRUCK_CATALOG, TRAILER_CATALOG, CARGO_DATABASE, SETTINGS } from 'config';
-import { initAudioEngine, updateMotorSound, playBrakeSqueal, playTrafficHorn } from 'audio';
-import { updateTrafficCarsAI } from 'traffic';
+// Исправлены пути импорта для совместимости с GitHub Pages
+import { TRUCK_CATALOG, TRAILER_CATALOG, CARGO_DATABASE, SETTINGS } from './config.js';
+import { initAudioEngine, updateMotorSound, playBrakeSqueal, playTrafficHorn } from './audio.js';
+import { updateTrafficCarsAI } from './traffic.js';
 
 const canvas = document.getElementById('gameCanvas');
 const scene = new THREE.Scene();
@@ -41,7 +42,7 @@ let gpsArrowMesh, cargoHubMarker, destinationHubMarker, gasStationMarker, stoSer
 
 let currentLat = 48.8584; let currentLon = 2.2945;
 const latToMeters = 111132; const lonToMeters = 73000;
-let currentCountry = "Франция 🇫РУ";
+let currentCountry = "Франция 🇫🇷";
 let cargoCoords = { x: 50, z: -40 }, destCoords = { x: -300, z: -250 }, gasCoords = { x: -60, z: -100 }, stoCoords = { x: 100, z: -20 };
 
 function saveGameProgress() {
@@ -96,7 +97,7 @@ function updateShopMenusUI() {
         if (companyData.ownedTrucks.includes(t.id)) {
             const div = document.createElement('div'); div.className = "shop-item-card";
             div.innerHTML = `<div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn" ${companyData.selectedTruckId === t.id ? 'disabled':''}>Взять</button>`;
-            if(companyData.selectedTruckId !== t.id) div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
+            div.querySelector('button').addEventListener('click', () => window.selectTruck(t.id)); garageList.appendChild(div);
         }
     });
 
@@ -120,6 +121,7 @@ function updateShopMenusUI() {
     });
 }
 
+// Привязываем функции к глобальному объекту window, чтобы HTML кнопки их «видели»
 window.buyTruck = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrucks.push(id); updateShopMenusUI(); saveGameProgress(); } };
 window.buyTrailer = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrailers.push(id); updateShopMenusUI(); saveGameProgress(); } };
 window.selectTruck = function(id) { companyData.selectedTruckId = id; buildComposition3D(); updateShopMenusUI(); saveGameProgress(); };
@@ -144,7 +146,7 @@ function spawnBorderCheckpoints() {
     const kppGroup = new THREE.Group(); kppGroup.position.set(-180, 0, -150);
     const booth = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 8), new THREE.MeshStandardMaterial({ color: '#475569' })); booth.position.y = 2; kppGroup.add(booth);
     const barrier = new THREE.Mesh(new THREE.BoxGeometry(12, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: '#eab308' })); barrier.position.set(-6, 2, -12); kppGroup.add(barrier);
-    const customsZone = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.2, 16), new THREE.MeshBasicMaterial({ color: '#ef4444', transparent: true, opacity: 0.3 })); customsZone.position.set(0, 0.1, -12); kppGroup.add(customsZone);
+const customsZone = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.2, 16), new THREE.MeshBasicMaterial({ color: '#ef4444', transparent: true, opacity: 0.3 })); customsZone.position.set(0, 0.1, -12); kppGroup.add(customsZone);
 scene.add(kppGroup); colliders.push(new THREE.Box3().setFromObject(booth));
 borderCheckpoints.push({ position: new THREE.Vector3(-180, 0, -162), radius: 8.0, barrierMesh: barrier, zoneMesh: customsZone, isCleared: false, timer: 0 });
 }
@@ -156,7 +158,7 @@ if (companyData.hasOrder && !kpp.isCleared) {
 document.getElementById('customsStatus').innerText = "ДОСМОТР ТД... 📄";
 truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, 0.2); kpp.timer += 1;
 if (kpp.timer > 100) {
-alert("📋 Таможня пройдена успешно. Документы CMR заверены печатью."); kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e');
+alert("📋 Таможенный контроль успешно пройден. Проезд открыт!"); kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e');
 }
 } else if (!companyData.hasOrder) { kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e'); }
 } else if (dist > kpp.radius + 15 && kpp.isCleared) {
@@ -262,7 +264,7 @@ function gameLoop() {
 requestAnimationFrame(gameLoop); if (!isCompanyRegistered) { renderer.render(scene, camera); return; }
 dayTime += 0.0004; if (dayTime > 1.0) dayTime = 0.0;
 const isNight = dayTime > 0.55 && dayTime < 0.95;
-scene.background = new THREE.Color(isNight ? '#020617' : '#bae6fd'); sunLight.intensity = isNight ? 0.0 : 1.4;
+scene.background = new THREE.Color(isNight ? '#020617' : '#38bdf8'); sunLight.intensity = isNight ? 0.0 : 1.4;
 const currentTruckConfig = TRUCK_CATALOG.find(t => t.id === companyData.selectedTruckId);
 if (companyData.truckStats.fuel > 0 && companyData.truckStats.condition > 1) {
 if (keys.w || (touchData.moveId !== null && touchData.activeMoveY < -0.1)) {
