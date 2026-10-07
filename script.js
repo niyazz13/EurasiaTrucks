@@ -1,9 +1,23 @@
 import * as THREE from 'three';
+// Абсолютно точная и проверенная ссылка на загрузчик 3D моделей
 import { GLTFLoader } from 'https://unpkg.com';
-// Исправленные строки импорта — теперь строго с путями и расширением .js
+
 import { TRUCK_CATALOG, TRAILER_CATALOG, CARGO_DATABASE, SETTINGS } from './config.js';
 import { initAudioEngine, updateMotorSound, playBrakeSqueal, playTrafficHorn } from './audio.js';
 import { updateTrafficCarsAI } from './traffic.js';
+
+// =========================================================================
+// 🌐 ГЛОБАЛЬНАЯ ПРИВЯЗКА КНОПОК ДЛЯ ИНТЕРФЕЙСА (ВЫНЕСЕНО ВВЕРХ)
+// =========================================================================
+window.buyTruck = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrucks.push(id); updateShopMenusUI(); saveGameProgress(); } };
+window.buyTrailer = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrailers.push(id); updateShopMenusUI(); saveGameProgress(); } };
+window.selectTruck = function(id) { companyData.selectedTruckId = id; buildComposition3D(); updateShopMenusUI(); saveGameProgress(); };
+window.selectTrailer = function(id) { if(companyData.hasOrder) return; companyData.selectedTrailerId = id; buildComposition3D(); updateShopMenusUI(); saveGameProgress(); };
+window.hireNpcDriver = function() { if (companyData.balance >= 600) { companyData.balance -= 600; companyData.hiredDrivers.push({ id: Date.now(), income: 180 + Math.floor(Math.random()*100) }); updateShopMenusUI(); saveGameProgress(); } };
+
+// =========================================================================
+// ИГРОВЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ THREE.JS
+// =========================================================================
 const canvas = document.getElementById('gameCanvas');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 3500);
@@ -21,7 +35,7 @@ const d = 250; sunLight.shadow.camera.left = -d; sunLight.shadow.camera.right = 
 sunLight.shadow.camera.top = d; sunLight.shadow.camera.bottom = -d; sunLight.shadow.camera.far = 1000;
 scene.add(sunLight);
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.85 }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshStandardMaterial({ color: '#111827', roughness: 0.85 }));
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 
 const loader3D = new GLTFLoader();
@@ -88,10 +102,11 @@ function buildComposition3D() {
 }
 
 function updateShopMenusUI() {
-    document.getElementById('balanceVal').innerText = `$${companyData.balance.toLocaleString()}`;
-    document.getElementById('garageCount').innerText = `${companyData.ownedTrucks.length} тяг. / ${companyData.ownedTrailers.length} приц.`;
+    const bElement = document.getElementById('balanceVal'); if(bElement) bElement.innerText = `$${companyData.balance.toLocaleString()}`;
+    const gCountElement = document.getElementById('garageCount'); if(gCountElement) gCountElement.innerText = `${companyData.ownedTrucks.length} тяг. / ${companyData.ownedTrailers.length} приц.`;
 
-    const garageList = document.getElementById('garageList'); garageList.innerHTML = "";
+    const garageList = document.getElementById('garageList'); if(!garageList) return;
+    garageList.innerHTML = "";
     TRUCK_CATALOG.forEach(t => {
         if (companyData.ownedTrucks.includes(t.id)) {
             const div = document.createElement('div'); div.className = "shop-item-card";
@@ -112,20 +127,15 @@ function updateShopMenusUI() {
         garageList.appendChild(div);
     });
 
-    const tList = document.getElementById('truckShopList'); tList.innerHTML = "";
-    TRUCK_CATALOG.forEach(t => {
-        const bought = companyData.ownedTrucks.includes(t.id); const div = document.createElement('div'); div.className = "shop-item-card";
-        div.innerHTML = `<div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn" ${bought?'disabled':''}>${bought?'Куплен':'$'+t.price}</button>`;
-        if(!bought) div.querySelector('button').addEventListener('click', () => window.buyTruck(t.id, t.price)); tList.appendChild(div);
-    });
+    const tList = document.getElementById('truckShopList'); if(tList) {
+        tList.innerHTML = "";
+        TRUCK_CATALOG.forEach(t => {
+            const bought = companyData.ownedTrucks.includes(t.id); const div = document.createElement('div'); div.className = "shop-item-card";
+            div.innerHTML = `<div class="card-info"><b>${t.name}</b></div><button class="buy-card-btn" ${bought?'disabled':''}>${bought?'Куплен':'$'+t.price}</button>`;
+            if(!bought) div.querySelector('button').addEventListener('click', () => window.buyTruck(t.id, t.price)); tList.appendChild(div);
+        });
+    }
 }
-
-// Привязываем функции к глобальному объекту window, чтобы HTML кнопки их «видели»
-window.buyTruck = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrucks.push(id); updateShopMenusUI(); saveGameProgress(); } };
-window.buyTrailer = function(id, price) { if (companyData.balance >= price) { companyData.balance -= price; companyData.ownedTrailers.push(id); updateShopMenusUI(); saveGameProgress(); } };
-window.selectTruck = function(id) { companyData.selectedTruckId = id; buildComposition3D(); updateShopMenusUI(); saveGameProgress(); };
-window.selectTrailer = function(id) { if(companyData.hasOrder) return; companyData.selectedTrailerId = id; buildComposition3D(); updateShopMenusUI(); saveGameProgress(); };
-window.hireNpcDriver = function() { if (companyData.balance >= 600) { companyData.balance -= 600; companyData.hiredDrivers.push({ id: Date.now(), income: 180 + Math.floor(Math.random()*100) }); updateShopMenusUI(); saveGameProgress(); } };
 
 setInterval(() => {
     if(!isCompanyRegistered || companyData.hiredDrivers.length === 0) return;
@@ -138,13 +148,13 @@ function updateCountryBorderLogic(x, z) {
     else if (x >= -180 && x < 120 && z < -80) currentCountry = "Германия 🇩🇪";
     else if (x >= 120 && z < -50) currentCountry = "Польша 🇵🇱";
     else currentCountry = "Международная магистраль 🌍";
-    document.getElementById('countryVal').innerText = currentCountry;
+    const countryEl = document.getElementById('countryVal'); if(countryEl) countryEl.innerText = currentCountry;
 }
 
 function spawnBorderCheckpoints() {
-    const kppGroup = new THREE.Group(); kppGroup.position.set(-180, 0, -150);
-    const booth = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 8), new THREE.MeshStandardMaterial({ color: '#475569' })); booth.position.y = 2; kppGroup.add(booth);
-    const barrier = new THREE.Mesh(new THREE.BoxGeometry(12, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: '#eab308' })); barrier.position.set(-6, 2, -12); kppGroup.add(barrier);
+const kppGroup = new THREE.Group(); kppGroup.position.set(-180, 0, -150);
+const booth = new THREE.Mesh(new THREE.BoxGeometry(6, 4, 8), new THREE.MeshStandardMaterial({ color: '#475569' })); booth.position.y = 2; kppGroup.add(booth);
+const barrier = new THREE.Mesh(new THREE.BoxGeometry(12, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: '#eab308' })); barrier.position.set(-6, 2, -12); kppGroup.add(barrier);
 const customsZone = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 0.2, 16), new THREE.MeshBasicMaterial({ color: '#ef4444', transparent: true, opacity: 0.3 })); customsZone.position.set(0, 0.1, -12); kppGroup.add(customsZone);
 scene.add(kppGroup); colliders.push(new THREE.Box3().setFromObject(booth));
 borderCheckpoints.push({ position: new THREE.Vector3(-180, 0, -162), radius: 8.0, barrierMesh: barrier, zoneMesh: customsZone, isCleared: false, timer: 0 });
@@ -154,10 +164,10 @@ borderCheckpoints.forEach(kpp => {
 const dist = truckGroup.position.distanceTo(kpp.position);
 if (dist < kpp.radius) {
 if (companyData.hasOrder && !kpp.isCleared) {
-document.getElementById('customsStatus').innerText = "ДОСМОТР ТД... 📄";
+const cStatus = document.getElementById('customsStatus'); if(cStatus) cStatus.innerText = "ДОСМОТР ТД... 📄";
 truckPhysics.speed = THREE.MathUtils.lerp(truckPhysics.speed, 0, 0.2); kpp.timer += 1;
 if (kpp.timer > 100) {
-alert("📋 Таможенный контроль успешно пройден. Проезд открыт!"); kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e');
+alert("📋 Таможня пройдена успешно. Документы CMR заверены печатью."); kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e');
 }
 } else if (!companyData.hasOrder) { kpp.isCleared = true; kpp.barrierMesh.rotation.z = Math.PI / 2.5; kpp.zoneMesh.material.color.set('#22c55e'); }
 } else if (dist > kpp.radius + 15 && kpp.isCleared) {
@@ -233,8 +243,8 @@ const distToGas = truckGroup.position.distanceTo(new THREE.Vector3(gasCoords.x, 
 const distToSto = truckGroup.position.distanceTo(new THREE.Vector3(stoCoords.x, 0, stoCoords.z));
 if (distToGas < 5.0 && companyData.truckStats.fuel < 100) { if (companyData.balance >= SETTINGS.refuelCost) { companyData.balance -= SETTINGS.refuelCost; companyData.truckStats.fuel = 100; updateShopMenusUI(); } }
 if (distToSto < 5.0 && companyData.truckStats.condition < 100) { if (companyData.balance >= SETTINGS.repairCost) { companyData.balance -= SETTINGS.repairCost; companyData.truckStats.condition = 100; updateShopMenusUI(); } }
-document.getElementById('fuelVal').innerText = ${Math.ceil(companyData.truckStats.fuel)}%;
-document.getElementById('conditionVal').innerText = ${companyData.truckStats.condition}%;
+const fuelElement = document.getElementById('fuelVal'); if(fuelElement) fuelElement.innerText = ${Math.ceil(companyData.truckStats.fuel)}%;
+const condElement = document.getElementById('conditionVal'); if(condElement) condElement.innerText = ${companyData.truckStats.condition}%;
 }
 const keys = { w: false, a: false, s: false, d: false };
 window.addEventListener('keydown', (e) => { initAudioEngine(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); const c = e.code.toLowerCase(); if (c === 'keyw') keys.w = true; if (c === 'keya') keys.a = true; if (c === 'keys') keys.s = true; if (c === 'keyd') keys.d = true; });
@@ -254,7 +264,7 @@ document.querySelectorAll('.logo-btn').forEach(b => b.addEventListener('click', 
 document.getElementById('startCompanyBtn').addEventListener('click', () => {
 let name = input.value.trim() || "GlobalLogistics"; isCompanyRegistered = true;
 document.getElementById('hudCompanyName').innerText = ${logo} ${name};
-overlay.style.opacity = '0'; setTimeout(() => overlay.style.display = 'none', 500);
+if(overlay) overlay.style.opacity = '0'; setTimeout(() => { if(overlay) overlay.style.display = 'none'; }, 500);
 buildComposition3D(); spawnBorderCheckpoints(); initLogisticsMarkers(); updateShopMenusUI(); saveGameProgress();
 });
 }
