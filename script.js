@@ -366,12 +366,30 @@ if (keys.a || (touchData.moveId !== null && touchData.activeMoveX < -0.1)) truck
 if (keys.d || (touchData.moveId !== null && truckData.activeMoveX > 0.1)) truckPhysics.angle -= truckPhysics.rotationSpeed * dir;
 }
 updateMotorSound(truckPhysics.speed);
-const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
-const nextX = truckGroup.position.x + stepX;
-if (!checkCollision(nextX, truckGroup.position.z)) truckGroup.position.x = nextX; else { truckPhysics.speed *= -0.3; companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); }
-updateTrafficCarsAI();
-updateCountryBorderLogic(truckGroup.position.x, truckGroup.position.z);
-updateCustomsControl(); updateGPSAndServicesLogic(); processLogisticsLogic();
+    const stepX = Math.sin(truckPhysics.angle) * truckPhysics.speed; 
+    const stepZ = Math.cos(truckPhysics.angle) * truckPhysics.speed;
+
+    const nextX = truckGroup.position.x + stepX;
+    if (!checkCollision(nextX, truckGroup.position.z)) {
+        truckGroup.position.x = nextX; 
+    } else { 
+        truckPhysics.speed *= -0.3; 
+        companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); 
+    }
+
+    const nextZ = truckGroup.position.z + stepZ;
+    if (!checkCollision(truckGroup.position.x, nextZ)) {
+        truckGroup.position.z = nextZ; 
+    } else { 
+        truckPhysics.speed *= -0.3; 
+        companyData.truckStats.condition = Math.max(0, companyData.truckStats.condition - SETTINGS.crashDamagePercent); 
+    }
+    truckGroup.rotation.y = truckPhysics.angle;
+    updateTrafficCarsAI();
+    updateCountryBorderLogic(truckGroup.position.x, truckGroup.position.z);
+    updateCustomsControl(); 
+    updateGPSAndServicesLogic(); 
+    processLogisticsLogic();
 const calcLat = currentLat - (truckGroup.position.z / latToMeters); const calcLon = currentLon + (truckGroup.position.x / lonToMeters);
 const co = document.getElementById('coordsVal'); if(co) co.innerText = ${calcLat.toFixed(4)}, ${calcLon.toFixed(4)};
 if (Math.random() > 0.985) loadRealOSMData(calcLat, calcLon);
